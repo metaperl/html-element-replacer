@@ -1,0 +1,138 @@
+=head1 NAME
+
+  HTML::Element::Replacer - simplify the HTML::Element clone() - push_content() ritual
+
+=head1 SYNOPSIS
+
+  use HTML::Element::Replacer;
+
+  {
+   my $replacer = HTML::Element::Replacer->new(tree => $tree, look_down => [ scla => 'mid' ]);
+ 
+   for my $data (@data) {
+     $replacer->push_clone->defmap(attr_name => $data); # clone and push onto @temp_list
+   }
+  }
+  # by default Replacer replaces... so it removes the element you were push_clone()ing
+ 
+ 
+=head1 DESCRIPTION
+
+Let's say you have this HTML:
+
+ <table>
+
+   <tr scla="top"/> 
+
+   <tr scla="mid"> 
+     <td kmap="brand"> blah </td>
+     <td kmap="age"> blah </td>
+   </tr>
+
+   <tr scla="bot"/> 
+
+ </table>
+
+Now let's say you have 5 data rows that you wish to display using the middle C<tr> as your sample.
+The pure HTML::Tree way to do this would be:
+
+ my $sample_tr = $tree->look_down(scla => 'mid');
+
+ my @c;
+ for my $data (@data) {
+    my $c = $sample_tr->clone; 
+    $c->defmap(kmap => $data);
+    push @c, $c;
+ }
+
+ $sample->replace_with(@c);
+
+We did cheat a bit by using C<defmap()> from L<HTML::Element::Library|HTML::Element::Library>.
+Now, with this class, we can do this:
+
+ { 	
+    my $replacer = HTML::Element::Replacer->new(look_down => [ scla => 'mid' ]);
+ 
+    for my $data (@data) {
+	my $clone = $replacer->push_clone->defmap(kmap => $data); # clone and push onto @temp_list
+    }
+
+ } # replacer goes out of scope and then replaces sample_tr
+
+
+=head1 AUTHOR
+
+Terrence Brannon, C<< <tbone at cpan.org> >>
+
+Many thanks to Dave Rolsky in #moose on irc.perl.org
+
+  [16:04] @autarch: metaperl: I'm not sure you understand what "going out of scope" means
+  [16:05] @autarch: { my $x = { foo => 1 }; my $y = { x => $x }; }
+  [16:05] @autarch: both $x & $y go out of scope at the end of the block
+  [16:05] @autarch: my $x = { foo => 1 };{  my $y = { x => $x }; }
+  [16:05] @autarch: $y goes out of scope at the end of the block, $x persists
+  [16:06] @autarch: my $x = { foo => 1 };{  my $y = {}; $x->{y} = $y }
+  [16:06] @autarch: $y does not go out of scope until $x does
+  [16:06] @autarch: the only thing that matters is references _to_ the thing in question, not references it holds
+  [16:07] metaperl: ok that answers my question perfectly.... it doesnt matter if the hashref points to something that will remain 'alive' due to being defined in larger scope. thank you. now if $y were blessed into a class, when it goes out of scope... Classname::DESTROY($self) would be called .... where $self is $y in this case?
+  [16:08] metaperl: because manually calling $object->finish is not elegant
+  [16:08] metaperl: I want to handle that in a destructor method
+
+=head1 SOURCE
+
+L<http://code.google.com/p/html-element-replacer/>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-html-element-replacer at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Element-Replacer>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc HTML::Element::Replacer
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Element-Replacer>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/HTML-Element-Replacer>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/HTML-Element-Replacer>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/HTML-Element-Replacer/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Terrence Brannon, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+1; # End of HTML::Element::Replacer
