@@ -80,7 +80,7 @@ Many thanks to Dave Rolsky in #moose on irc.perl.org
 
 =head1 SOURCE
 
-L<http://code.google.com/p/html-element-replacer/>
+L<http://github.com/metaperl/html-element-replacer>
 
 
 =head1 BUGS
